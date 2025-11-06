@@ -13,7 +13,7 @@ form {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 200px;
+    width: 500px;
     margin: 20px auto;
 }
 
@@ -64,4 +64,20 @@ button {
         margin-left: auto;
     }
     
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 10px;
+    border: 1px solid $button-color;
+    text-align: left;
+  }
+
+  th {
+    background-color: $primary-color;
+    color: white;
+  }
 }
