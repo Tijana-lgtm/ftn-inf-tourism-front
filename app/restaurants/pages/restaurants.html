@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script type="module" src="restaurants.ts"></script>
+    <link rel="stylesheet" href="restaurants.scss">
+    <title>Gastronomia</title>
+  </head>
+
+  <body>
+    <div>
+      <h2>Restaurants</h2>
+      <hr>
+      <table id="test1">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Capacity</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Status</th>
+            <th>Picture</th>
+            <th>Edit restaurant</th>
+            <th>Remove restaurant</th>
+          </tr>
+        </thead>
+
+        <tbody id="restaurantsTableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="dodajRestoran">
+      <form id="tourForm">
+        <div>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" required></textarea>
+        </div>
+        <div>
+          <label for="capacity">Capacity:</label>
+          <input type="number" id="capacity" name="capacity" required>
+        </div>
+        <div>
+          <label for="latitude">Latitude:</label>
+          <input type="number" id="latitude" name="latitude" required>
+        </div>
+        <div>
+          <label for="longitude">Longitude:</label>
+          <input type="number" id="longitude" name="longitude" required>
+        </div>
+        <div>
+          <label for="picture">Picture:</label>
+          <input type="text" id="picture" name="picture" required>
+        </div>
+           
+
+            <button type="button" id="addRestaurant">
+              Add Restaurant
+            </button>
+
+        </form>
+    </div>
+    
+
+  </body>
+</html>
