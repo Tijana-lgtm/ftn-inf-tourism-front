@@ -1,1 +1,356 @@
+
 @import '../../styles/global.scss';
+
+body {
+  font-family: "Inter", Arial, sans-serif;
+  background: #f2f2f2;
+  padding: 20px;
+  color: #1d1d1d;
+}
+
+h2, h3, h4 {
+  color: #1d1d1d;
+  font-weight: 500;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background: #3a3a3a;
+  margin: 15px 0;
+}
+
+table {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 60px auto;
+  border-collapse: collapse;
+  background: $color-white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th {
+  background: $color-primary;
+  color: white;
+  padding: 30px 22px;
+  text-align: center;
+  font-size: 14px;
+  
+  &:nth-child(1) { width: 15%; } 
+  &:nth-child(2) { width: 25%; } 
+  &:nth-child(3) { width: 10%; } 
+  &:nth-child(4) { width: 15%; } 
+  &:nth-child(5) { width: 12%; } 
+  &:nth-child(6) { width: 8%; }  
+  &:nth-child(7) { width: 8%; }  
+}
+
+td {
+  padding: 24px 18px;
+  border-bottom: 1px solid #e5e5e5;
+  color: $color-gray-900;
+  background: white;
+  vertical-align: top;
+  
+  &:nth-child(2) {
+    word-wrap: break-word;
+    max-width: 300px;
+  }
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #e1f0e8;
+}
+
+// Edit i Delete dugmad u tabeli
+.edit-btn {
+  background: $color-warning;
+  color: #1b1b1b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    background: darken($color-warning, 10%);
+  }
+}
+
+.delete-btn {
+  background: $color-accent;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    background: darken($color-accent, 10%);
+  }
+}
+// Forma za dodavanje ture
+#addTour {
+  max-width: 550px;
+  background: $color-white;
+  margin: 30px auto;
+  padding: 35px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  
+  h3 {
+    color: $color-primary;
+    margin-bottom: 15px;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  
+  label {
+    color: $color-primary-dark;
+    font-weight: 600;
+  }
+  
+  input, textarea {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #c8c8c8;
+    font-size: 14px;
+    
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.25);
+    }
+  }
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+// Dugmad za turu
+#addTourBtn,
+#updateTourBtn,
+#publishTourBtn {
+  background: $color-primary;
+  color: white;
+  
+  &:hover {
+    background: $color-primary-dark;
+  }
+  
+  &:disabled {
+    background: #9bb9a5;
+    cursor: not-allowed;
+  }
+}
+
+// Description counter
+#descriptionCounter {
+  font-size: 13px;
+  color: $color-gray-600;
+  text-align: right;
+  margin-top: 4px;
+}
+
+// Key Points sekcija
+#keyPointsSection {
+  background: $color-white;
+  padding: 25px;
+  margin-top: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  
+  h3 {
+    color: $color-primary;
+  }
+}
+
+// Dugme za dodavanje key pointa
+#addKeyPointBtn {
+  background: $color-primary;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+  
+  &:hover {
+    background: $color-primary-dark;
+  }
+}
+
+// Forma za key point
+#keyPointForm {
+  margin-top: 20px;
+  background: #e1f0e8;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #c8ddd0;
+  
+  h4 {
+    color: $color-primary-dark;
+    margin-bottom: 12px;
+  }
+  
+  label {
+    color: $color-primary-dark;
+    font-weight: 600;
+    display: block;
+    margin-top: 10px;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #c8c8c8;
+    font-size: 14px;
+    margin-top: 4px;
+    
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.25);
+    }
+  }
+  
+  #keyPointError {
+    background: rgba($color-danger, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    color: $color-danger;
+    margin-top: 10px;
+    border: 1px solid $color-danger;
+  }
+}
+
+#saveKeyPointBtn {
+  background: $color-success;
+  color: white;
+  
+  &:hover {
+    background: darken($color-success, 10%);
+  }
+}
+
+#cancelKeyPointBtn {
+  background: $color-accent;
+  color: white;
+  
+  &:hover {
+    background: darken($color-accent, 10%);
+  }
+}
+
+// Key Points kontejner (grid)
+#keyPointsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+// Key Point kartica
+.keypoint-card {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  color: $color-gray-900;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  
+  h4 {
+    font-weight: 600;
+    color: $color-primary;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    font-size: 14px;
+    color: $color-gray-700;
+    margin-bottom: 6px;
+  }
+  
+  .keypoint-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin: 8px 0;
+  }
+  
+  .deleteKeyPointBtn {
+    background: $color-accent;
+    color: white;
+    border-radius: 6px;
+    padding: 6px 10px;
+    width: 100%;
+    margin-top: 8px;
+    
+    &:hover {
+      background: darken($color-accent, 10%);
+    }
+  }
+}
+
+// Status (ako treba)
+#publishStatus {
+  background: #e1f0e8;
+  padding: 12px;
+  border-radius: 8px;
+  color: $color-primary-dark;
+  margin-bottom: 15px;
+  border: 1px solid #c8ddd0;
+}
+
+// Modal (ako koristiš za potvrde)
+#modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.30);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#modalContent {
+  background: white;
+  width: 420px;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+  color: black;
+}
+
+#closeModalBtn {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  background: $color-accent;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  
+  &:hover {
+    background: darken($color-accent, 10%);
+  }
+}
