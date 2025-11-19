@@ -1,101 +1,55 @@
-$primary-color: #007bff;
-$accent-color: #ff5733;
-$warn-color: #d9534f; 
-$button-color: #28a745; 
+$color-primary: #2d5f4f;
+$color-primary-light: #3a7a63;
+$color-primary-dark: #1f4436;
 
-body {
-    font-family: Arial, sans-serif;
+$color-secondary: #c8ddd0;
+$color-secondary-light: #e1f0e8;
+
+$color-accent: #ff5722;
+$color-success: #28a745;
+$color-warning: #ffc107;
+$color-danger: #dc3545;
+
+$color-white: #ffffff;
+
+$color-gray-100: #f8f9fa;
+$color-gray-200: #e9ecef;
+$color-gray-300: #dee2e6;
+$color-gray-400: #ced4da;
+$color-gray-500: #adb5bd;
+$color-gray-600: #6c757d;
+$color-gray-700: #495057;
+$color-gray-800: #343a40;
+$color-gray-900: #212529;
+
+// Navbar
+.navbar {
+  background-color: $color-primary;
+  padding: 10px;
+
+  .nav-list {
+    list-style: none;
     margin: 0;
     padding: 0;
-}
-
-table{
-    border-collapse: collapse;
-    width: 100%;
-}
-
-th, td {
-    border: 1px solid #2b2b2b;
-    padding: 6px;
-    text-align: left;
-    font-size: 14px;
-}
-
-th {
-    background-color: #d5d3d3;
-}
-
-
-form {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 500px;
-    margin: 20px auto;
-}
-
-label {
-    font-size: 14px;
-    color: $primary-color;
-}
-
-input {
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-button {
-    padding: 10px 15px;
-    background-color: $button-color;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor:pointer;
-}
-
-.navbar {
-    background-color: $primary-color;
-    padding: 10px;
-
-    .nav-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-    }
-
-    .nav-item {
-        margin-right: 15px;
-
-        a {
-            color: white;
-        }
-    }
-
-    #login {
-        margin-left: auto;
-    }
-
-    #logout {
-        margin-left: auto;
-    }
-    
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-
-  th, td {
-    padding: 10px;
-    border: 1px solid $button-color;
-    text-align: left;
   }
 
-  th {
-    background-color: $primary-color;
-    color: white;
+  .nav-item {
+    margin-right: 15px;
+
+    a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      
+      &:hover {
+        background-color: $color-primary-light;
+      }
+    }
+  }
+
+  #login,
+  #logout {
+    margin-left: auto;
   }
 }

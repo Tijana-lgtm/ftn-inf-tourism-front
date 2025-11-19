@@ -107,4 +107,25 @@ export class TourService {
                 throw error
             });
     }
+    publish(tourId: string): Promise<Tour> {
+    return fetch(`${this.apiUrl}/${tourId}/publish`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(errorMessage => {
+                throw { status: response.status, message: errorMessage }
+            })
+        }
+        return response.json()
+    })
+    .then((tour: Tour) => {
+        return tour
+    })
+    .catch(error => {
+        console.error('Error:', error.status)
+        throw error
+    })
+    }
 }

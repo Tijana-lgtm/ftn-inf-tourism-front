@@ -5,4 +5,5 @@ export interface Tour {
   maxGuests: number;
   dateTime: string; 
   guideId?: number;
+  status?: string;
 }
