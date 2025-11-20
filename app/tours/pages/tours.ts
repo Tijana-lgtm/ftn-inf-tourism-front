@@ -188,13 +188,35 @@ function initializeForm(): void {
         
         tourService.getById(id)
             .then(tour => {  
+                 console.log('🔍 === TOUR DEBUG ===');
+        console.log('Raw response:', JSON.stringify(tour, null, 2));
+        console.log('tour.keyPoints exists?', 'keyPoints' in tour);
+        console.log('tour.keyPoints value:', tour.keyPoints);
+        console.log('tour.keyPoints type:', typeof tour.keyPoints);
+        console.log('tour.keyPoints length:', tour.keyPoints?.length || 0);
+        
+        if (tour.keyPoints && tour.keyPoints.length > 0) {
+            console.log('✅ Key points FOUND:', tour.keyPoints);
+        } else {
+            console.log('❌ Key points EMPTY or UNDEFINED');
+        }
+        console.log('🔍 ===================');
                 (document.querySelector('#name') as HTMLInputElement).value = tour.name;
                 (document.querySelector('#description') as HTMLInputElement).value = tour.description;
                 (document.querySelector('#capacity') as HTMLInputElement).value = tour.maxGuests.toString(); 
                 (document.querySelector('#dateTime') as HTMLInputElement).value = tour.dateTime;
                 
                 updateDescriptionCounter();
-                loadKeyPoints(id);
+                if (tour.keyPoints && tour.keyPoints.length > 0) {
+    console.log('📍 Found', tour.keyPoints.length, 'key points');
+    keyPoints = tour.keyPoints;  // Sačuvaj u globalnu promenljivu
+} else {
+    console.log('⚠️ No key points in tour');
+    keyPoints = [];
+}
+renderKeyPoints();  // Pozovi BEZ parametara
+validatePublishConditions();  // Proveri uslove za publish
+
                 setupKeyPointForm(); 
             }).catch(error => {
                 console.error(error.status, error.text);
