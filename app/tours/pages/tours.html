@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script type="module" src="tours.ts"></script>
+    <link rel="stylesheet" href="tours.scss">
+    <title>Gastronomia</title>
+  </head>
+
+  <body>
+
+    <div>
+      <h2>Tours</h2>
+      <hr>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Max Guests</th>
+            <th>Date and Time</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+
+        <tbody id="toursTBody"></tbody>
+      </table>
+    </div>
+
+    <div id="addTour">
+      <form id="tourForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+            
+            <label for="capacity">Max Guests:</label>
+            <input type="number" id="capacity" name="capacity" required>
+
+            <label for="dateTime">Date and Time:</label>
+            <input type="datetime-local" id="dateTime" name="dateTime" required>
+
+            <button type="button" id="addTourBtn">Add Tour</button>
+        </form>
+    </div>
+
+  </body>
+</html>
