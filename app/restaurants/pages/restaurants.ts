@@ -197,14 +197,14 @@ function initializeForm(): void{
             console.error(error.status, error.text);
         });
     }
-    //SAKRIVA SEKCIJU JELA AKO NIJE EDIT
     else{
         const mealsSection = document.querySelector('#mealsSection');
         if (mealsSection) {
             (mealsSection as HTMLElement).style.display = 'none';
+        }
     }
 }
-}
+
 function loadMeals(restaurantId: string): void {
     mealService.getAll(restaurantId)
         .then(loadedMeals => {
@@ -279,22 +279,17 @@ function createMealCard(meal: Meal): HTMLElement {
     return card;
 }
 
-
-
-
 function toggleMealForm(show: boolean): void {
     const mealForm = document.querySelector('#mealForm');
     if (mealForm) {
         (mealForm as HTMLElement).style.display = show ? 'block' : 'none';
         
         if (!show) {
-
             (document.querySelector('#mealName') as HTMLInputElement).value = '';
             (document.querySelector('#mealPrice') as HTMLInputElement).value = '';
             (document.querySelector('#mealIngredients') as HTMLTextAreaElement).value = '';
             (document.querySelector('#mealImage') as HTMLInputElement).value = '';
             
-            // UKLONI PORUKU O GRESKAMA
             const errorMsg = document.querySelector('#mealErrorMessage');
             if (errorMsg) {
                 errorMsg.textContent = '';
@@ -443,7 +438,3 @@ document.addEventListener("DOMContentLoaded", () => {
         pictureInput.addEventListener('input', updatePublishButtonState);
     }
 });
-
-
-
- 
