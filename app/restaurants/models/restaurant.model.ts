@@ -1,3 +1,6 @@
+import { Meal } from "./meal";
+
+
 export interface Restaurant {
   id?: number;
   name: string;
@@ -8,4 +11,5 @@ export interface Restaurant {
   longitude: number;
   status: string;
   ownerId: number; 
+  meals?: Meal[];
 }

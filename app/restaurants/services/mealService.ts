@@ -1,4 +1,5 @@
 import {Meal} from "../models/meal";
+import { Restaurant } from "../models/restaurant.model";
 
 export class MealService{
   private apiUrl: string;
@@ -8,7 +9,7 @@ export class MealService{
   }
 
   getAll(restaurantId: string): Promise<Meal[]> {
-          return fetch(`${this.apiUrl}/${restaurantId}/meals`)
+    return fetch(`http://localhost:5105/api/restaurants/${restaurantId}`)
               .then(response => {
                   if (!response.ok) {
                       return response.text().then(errorMessage => {
@@ -17,8 +18,9 @@ export class MealService{
                   }
                   return response.json()
               })
-              .then((meals: Meal[]) => {
-                  return meals;
+              .then((restaurant: Restaurant) => {
+            // Vrati samo meals iz restorana
+            return restaurant.meals || [];
               })
               .catch(error => {
                   console.error('Error:', error.status)
