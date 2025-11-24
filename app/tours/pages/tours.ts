@@ -129,6 +129,13 @@ function submitData(): void {
         alert("All fields are required!");
         return;
     }
+    const selectedDate = new Date(dateTime);
+    const now = new Date();
+    
+    if (selectedDate <= now) {
+        alert("Date and time must be in the future!");
+        return;
+    }
 
     const formData: Tour = { 
         name, 
@@ -209,13 +216,13 @@ function initializeForm(): void {
                 updateDescriptionCounter();
                 if (tour.keyPoints && tour.keyPoints.length > 0) {
     console.log('📍 Found', tour.keyPoints.length, 'key points');
-    keyPoints = tour.keyPoints;  // Sačuvaj u globalnu promenljivu
+    keyPoints = tour.keyPoints;  
 } else {
     console.log('⚠️ No key points in tour');
     keyPoints = [];
 }
-renderKeyPoints();  // Pozovi BEZ parametara
-validatePublishConditions();  // Proveri uslove za publish
+renderKeyPoints();  
+validatePublishConditions();  
 
                 setupKeyPointForm(); 
             }).catch(error => {
@@ -431,7 +438,12 @@ function saveKeyPoint(): void {
                 keyPointForm.style.display = 'none';
             }
             clearKeyPointForm();
-            loadKeyPoints(currentTourId!);
+            return tourService.getById(currentTourId!);
+        })
+        .then(tour => {
+            keyPoints = tour.keyPoints || [];
+            renderKeyPoints();
+            validatePublishConditions();
         })
         .catch(error => {
             showKeyPointError(error.message || 'Error adding key point');
@@ -456,12 +468,27 @@ function publishTour(): void {
         return;
     }
     
-    tourService.publish(currentTourId)
+    tourService.getById(currentTourId)
+        .then(tour => {
+            // Napravi novi objekat bez guide-a
+            const tourToUpdate: Tour = {
+                name: tour.name,
+                description: tour.description,
+                maxGuests: tour.maxGuests,
+                dateTime: tour.dateTime,
+                guideId: tour.guideId,
+                status: 'published',
+                keyPoints: tour.keyPoints
+            };
+            
+            return tourService.update(currentTourId!, tourToUpdate);
+        })
         .then(() => {
             alert('Tour successfully published!');
-            window.location.href = '../pages/tours.html';
+            window.location.href = 'tours.html';
         })
         .catch(error => {
+            console.error('Error publishing tour:', error);
             alert('Error publishing tour: ' + error.message);
         });
 }
@@ -471,3 +498,4 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeForm();
     updateDescriptionCounter();
 });
+

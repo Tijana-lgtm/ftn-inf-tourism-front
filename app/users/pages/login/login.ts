@@ -29,6 +29,7 @@ function handleLogin(event: Event) {
             localStorage.setItem('role', user.role);
             localStorage.setItem('userId', user.id.toString());
             setUserLoginState(true);
+        window.location.href = '../../../index.html';
         })
         .catch((error) => {
             console.error('Login failed', error.message);
