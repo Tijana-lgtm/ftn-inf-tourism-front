@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <script type="module" src="restaurants.ts"></script>
+    <script type="module" src="tourists.ts"></script>
     <link rel="stylesheet" href="restaurants.scss">
     <title>Gastronomia</title>
   </head>
@@ -10,35 +10,6 @@
   <body>
     <div>
       <h2>Restaurants</h2>
-      
-    <label for="sortDropdown">Sort by:</label>
-<select id="sortDropdown">
-    <option value="Name">Name</option>
-    <option value="Description">Description</option>
-    <option value="Capacity">Capacity</option>
-</select>
-
-<label for="orderDropdown">Order:</label>
-<select id="orderDropdown">
-    <option value="ASC">Ascending</option>
-    <option value="DESC">Descending</option>
-</select>
-
-<label for="pageSize">Restaurants per page:</label>
-<select id="pageSize">
-    <option value="5">5</option>
-    <option value="10" selected>10</option>
-    <option value="20">20</option>
-</select>
-
-<div>
-    <button id="prevPage" disabled>Previous</button>
-    <button id="nextPage">Next</button>
-</div>
-
-
-      <div id="restaurantsCardsContainer" style="display: none;" class="cards-wrapper"></div>
-
       <hr>
       <table id="restaurantsTable">
         <thead>
@@ -57,11 +28,9 @@
 
         <tbody id="restaurantsTableBody"></tbody>
       </table>
-
-      <button type="button" id="showAddRestaurantForm">Add Restaurant</button>
     </div>
 
-    <div id="dodajRestoran" style="display:none;">
+    <div id="dodajRestoran">
       <h3>Restaurant data</h3>
       <form id="tourForm">
         <div>
@@ -88,13 +57,13 @@
           <label for="picture">Picture:</label>
           <input type="text" id="picture" name="picture" required>
         </div>
-                  
+           
+
             <button type="button" id="addRestaurant">
               Add Restaurant
             </button>
 
         </form>
-        
     </div>
     
     <div id="mealsSection" style="display: none;">
@@ -133,6 +102,5 @@
       <button type="button" id="publishRestaurant" disabled>Publish restaurant</button>
     </div>
   </div>
-
   </body>
 </html>

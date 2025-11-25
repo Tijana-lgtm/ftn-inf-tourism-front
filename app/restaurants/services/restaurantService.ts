@@ -9,24 +9,30 @@ export class RestaurantService {
         this.apiUrl = 'http://localhost:5105/api/restaurants';
     }
 
-    getAll(): Promise<Restaurant[]> {
-        return fetch(this.apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(errorMessage => {
-                        throw { status: response.status, message: errorMessage }
-                    })
-                }
-                return response.json()
-            })
-            .then((results: RestaurantResults) => {
-                return results.data;
-            })
-            .catch(error => {
-                console.error('Error:', error.status)
-                throw error
-            });
-    }
+ getAll(orderBy: string = "Name", orderDirection: string = "ASC", page: number = 1, pageSize: number = 10): Promise<RestaurantResults> {
+      const url = new URL(this.apiUrl);
+      url.searchParams.append("orderBy", orderBy);
+      url.searchParams.append("orderDirection", orderDirection);
+      url.searchParams.append("page", page.toString());
+      url.searchParams.append("pageSize", pageSize.toString());
+
+      return fetch(url.toString())
+          .then(response => {
+              if (!response.ok) {
+                  return response.text().then(errorMessage => {
+                      throw { status: response.status, message: errorMessage }
+                  });
+              }
+              return response.json();
+          })
+          .then((results: RestaurantResults) => {
+              return results;
+          })
+          .catch(error => {
+              console.error('Error:', error.status);
+              throw error;
+          });
+  }
 
     add(formData: Restaurant): Promise<Restaurant> {
         return fetch(this.apiUrl, {

@@ -7,15 +7,27 @@ import { MealService } from "../services/mealService";
 const restaurantService = new RestaurantService();
 const mealService = new MealService();
 
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 1;
+
+const sortDropdown = document.getElementById("sortDropdown") as HTMLSelectElement;
+const orderDropdown = document.getElementById("orderDropdown") as HTMLSelectElement;
+const pageSizeDropdown = document.getElementById("pageSize") as HTMLSelectElement;
+const prevPageButton = document.getElementById("prevPage") as HTMLButtonElement;
+const nextPageButton = document.getElementById("nextPage") as HTMLButtonElement;
+
+
 let currentRestaurantId: string | null = null;
 let meals: Meal[] = [];
 
-function renderData(): void {
+function renderData(orderBy: string = "Name", orderDirection: string = "ASC", page: number = 1, pageSizeParam: number = 10): void {
     const button = document.querySelector("#addRestaurant")
     if (button) {
         button.addEventListener("click", async(event) => {
             event.preventDefault();
-            submitData()})
+            submitData()
+        })
     }
     const addMealBtn = document.querySelector("#addMealBtn");
     if (addMealBtn) {
@@ -47,84 +59,133 @@ function renderData(): void {
         });
     }
 
-  restaurantService.getAll()
-      .then(restaurants => {
+    // Dodajemo parametara za sortiranje i paginaciju
+    restaurantService.getAll(orderBy, orderDirection, page, pageSizeParam)
+      .then(results => {
+        const restaurants = results.data; // API vraća { data: Restaurant[], totalCount: number }
+        const totalCount = results.totalCount;
+        totalPages = Math.ceil(totalCount / pageSizeParam);
+
+        prevPageButton.disabled = page === 1;
+        nextPageButton.disabled = page === totalPages;
+
+        const userRole = (localStorage.getItem("role") || "").trim().toLowerCase(); // "owner" or "client"
+        console.log("userRole:", userRole);
+        if (userRole === "vodic") {
+            const table = document.querySelector('#restaurantsTable') as HTMLElement;
+            if (table) table.style.display = "table";
+
+            const cards = document.querySelector('#restaurantsCardsContainer') as HTMLElement;
+            if (cards) cards.style.display = "none";
+        } else {
+            const table = document.querySelector('#restaurantsTable') as HTMLElement;
+            if (table) table.style.display = "none";
+
+            const cards = document.querySelector('#restaurantsCardsContainer') as HTMLElement;
+            if (cards) cards.style.display = "flex";
+            renderRestaurantCards(restaurants);
+            return;
+        }
+
         console.log(restaurants);
 
         const table = document.querySelector('#restaurantsTableBody');
 
-            if (!table) {
-                console.error('Table body not found');
-                return;
-            }
+        if (!table) {
+            console.error('Table body not found');
+            return;
+        }
 
-            for (let i = 0; i < restaurants.length; i++) {
+        for (let i = 0; i < restaurants.length; i++) {
 
-                const newRow = document.createElement('tr');
+            const newRow = document.createElement('tr');
 
-                const cell2 = document.createElement('td');
-                cell2.textContent = restaurants[i].name;
-                newRow.appendChild(cell2);
+            const cell2 = document.createElement('td');
+            cell2.textContent = restaurants[i].name;
+            newRow.appendChild(cell2);
 
-                const cell3 = document.createElement('td');
-                cell3.textContent = restaurants[i].description;
-                newRow.appendChild(cell3);
+            const cell3 = document.createElement('td');
+            cell3.textContent = restaurants[i].description;
+            newRow.appendChild(cell3);
 
-                const cell4 = document.createElement('td');
-                cell4.textContent = restaurants[i].capacity.toString();
-                newRow.appendChild(cell4);
+            const cell4 = document.createElement('td');
+            cell4.textContent = restaurants[i].capacity.toString();
+            newRow.appendChild(cell4);
 
-                const cell5 = document.createElement('td');
-                cell5.textContent = restaurants[i].latitude.toString();
-                newRow.appendChild(cell5);
+            const cell5 = document.createElement('td');
+            cell5.textContent = restaurants[i].latitude.toString();
+            newRow.appendChild(cell5);
 
-                const cell6 = document.createElement('td');
-                cell6.textContent = restaurants[i].longitude.toString();
-                newRow.appendChild(cell6);
+            const cell6 = document.createElement('td');
+            cell6.textContent = restaurants[i].longitude.toString();
+            newRow.appendChild(cell6);
 
-                const cell7 = document.createElement('td');
-                cell7.textContent = restaurants[i].status;
-                newRow.appendChild(cell7);
+            const cell7 = document.createElement('td');
+            cell7.textContent = restaurants[i].status;
+            newRow.appendChild(cell7);
 
-                const cell8 = document.createElement('td');
-                const restImage = document.createElement('img');
-                restImage.src = restaurants[i].imageUrl
-                cell8.appendChild(restImage)
-                newRow.appendChild(cell8);
+            const cell8 = document.createElement('td');
+            const restImage = document.createElement('img');
+            restImage.src = restaurants[i].imageUrl
+            cell8.appendChild(restImage)
+            newRow.appendChild(cell8);
 
-                const cell9 = document.createElement('td');               
-                const editBtn = document.createElement('button');
-                editBtn.textContent = 'Edit';
-                const restaurantId = restaurants[i].id;
-                editBtn.onclick = function(){
-                    
-                    window.location.href = `restaurants.html?id=${restaurantId}`;
+            const cell9 = document.createElement('td');               
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            const restaurantId = restaurants[i].id;
+            editBtn.onclick = function(){                   
+                window.location.href = `restaurants.html?id=${restaurantId}`;
+            };
+
+            cell9.appendChild(editBtn);
+            newRow.appendChild(cell9);
+
+            const cell10 = document.createElement('td');               
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Remove';
+            deleteBtn.onclick = function(){
+                restaurantService.delete(restaurantId.toString())
+                    .then(() => {
+                        window.location.reload();
+                     })
+                    .catch(error =>{
+                        console.error(error.status, error.text);
+                    });
                 };
+            cell10.appendChild(deleteBtn);
+            newRow.appendChild(cell10);
 
-                cell9.appendChild(editBtn);
-                newRow.appendChild(cell9);
-
-                const cell10 = document.createElement('td');               
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Remove';
-                deleteBtn.onclick = function(){
-                    restaurantService.delete(restaurantId.toString())
-                        .then(() => {
-                            window.location.reload();
-                         })
-                        .catch(error =>{
-                            console.error(error.status, error.text);
-                        });
-                    };
-                cell10.appendChild(deleteBtn);
-                newRow.appendChild(cell10);
-
-                table.appendChild(newRow);
-            }
+            table.appendChild(newRow);
+        }
 
       }).catch(error => {
             console.error(error.status, error.message);
         });
+}
+
+
+function renderRestaurantCards(restaurants: Restaurant[]): void {
+    const container = document.querySelector('#restaurantsCardsContainer') as HTMLElement;
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    restaurants.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'restaurant-card';
+
+        card.innerHTML = `
+            <img src="${r.imageUrl}" class="restaurant-img" alt="${r.name}">
+            <h3>${r.name}</h3>
+            <p>${r.description}</p>
+            <p><strong>Capacity:</strong> ${r.capacity}</p>
+            <p><strong>Location:</strong> ${r.latitude}, ${r.longitude}</p>
+            <p><strong>Status:</strong> ${r.status}</p>
+        `;
+
+        container.appendChild(card);
+    });
 }
 
 function submitData(): void {
@@ -432,6 +493,44 @@ function getRestaurantData(id: string): void{
 document.addEventListener("DOMContentLoaded", () => {
     renderData();
     initializeForm();
+
+    const showFormBtn = document.getElementById('showAddRestaurantForm')!;
+    const addRestaurantDiv = document.getElementById('dodajRestoran')!;
+
+    showFormBtn.addEventListener('click', () => {
+        addRestaurantDiv.style.display = 'block';   // prikaži formu
+        showFormBtn.style.display = 'none';        // sakrij dugme (po želji)
+    });
+
+    const addRestaurantBtn = document.getElementById('addRestaurant')!;
+    addRestaurantBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        submitData();                               // koristiš već postojeću funkciju
+    });
+
+
+    sortDropdown.addEventListener("change", () => renderData(sortDropdown.value, orderDropdown.value, currentPage, pageSize));
+    orderDropdown.addEventListener("change", () => renderData(sortDropdown.value, orderDropdown.value, currentPage, pageSize));
+    pageSizeDropdown.addEventListener("change", () => {
+    pageSize = parseInt(pageSizeDropdown.value);
+    currentPage = 1;
+    renderData(sortDropdown.value, orderDropdown.value, currentPage, pageSize);
+});
+
+prevPageButton.addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderData(sortDropdown.value, orderDropdown.value, currentPage, pageSize);
+    }
+});
+
+nextPageButton.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderData(sortDropdown.value, orderDropdown.value, currentPage, pageSize);
+    }
+});
+
 
     const pictureInput = document.querySelector('#picture');
     if (pictureInput) {

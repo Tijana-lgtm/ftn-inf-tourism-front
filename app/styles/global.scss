@@ -14,7 +14,7 @@ $text-dark: #1d1d1d;
 
 body {
   font-family: "Inter", Arial, sans-serif;
-  background: #000000;
+  background: #575757;
   padding: 20px;
   color: rgb(0, 0, 0);
 }
@@ -247,4 +247,27 @@ button {
     background: #b13b38;
   }
 }
+
+
+.cards-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.restaurant-card {
+  width: 80%;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.restaurant-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
 
