@@ -9,24 +9,38 @@ export class TourService {
         this.apiUrl = 'http://localhost:5105/api/tours';
     }
 
-    getAll(): Promise<Tour[]> {
-        return fetch(this.apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(errorMessage => {
-                        throw { status: response.status, message: errorMessage }
-                    })
-                }
-                return response.json()
-            })
-            .then((results: TourResult) => {
-                return results.data;
-            })
-            .catch(error => {
-                console.error('Error:', error.status)
-                throw error
-            });
-    }
+    getAll(
+    orderBy: string = "Name", 
+    orderDirection: string = "ASC",
+    page: number = 1,
+    pageSize: number = 10
+): Promise<TourResult> {  
+    const queryParams = new URLSearchParams({
+        orderBy: orderBy,
+        orderDirection: orderDirection,
+        page: page.toString(),
+        pageSize: pageSize.toString()
+    });
+
+    const url = `${this.apiUrl}?${queryParams.toString()}`;
+
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(errorMessage => {
+                    throw { status: response.status, message: errorMessage }
+                })
+            }
+            return response.json()
+        })
+        .then((results: TourResult) => {
+            return results;  
+        })
+        .catch(error => {
+            console.error('Error:', error.status)
+            throw error
+        });
+}
 
     add(formData: Tour): Promise<Tour> {
         return fetch(this.apiUrl, {

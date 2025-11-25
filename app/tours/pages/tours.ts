@@ -9,18 +9,290 @@ const keyPointService = new KeyPointService();
 let currentTourId: string | null = null;
 let keyPoints: KeyPoint[] = [];
 
+// ==================== NOVE VARIJABLE ZA TURISTE ====================
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 1;
+let currentSort = "Name";
+let currentOrder = "ASC";
+
+// ==================== PROVERA ROLE ====================
+function getUserRole(): string | null {
+    return localStorage.getItem('role');
+}
+
+function isGuide(): boolean {
+    return getUserRole() === 'vodic';
+}
+
+// ==================== TURISTICKI PRIKAZ (NOVI KOD) ====================
+function showTouristView(): void {
+    const guideView = document.querySelector('#guideView') as HTMLElement;
+    const touristView = document.querySelector('#touristView') as HTMLElement;
+    
+    if (guideView) guideView.style.display = 'none';
+    if (touristView) touristView.style.display = 'block';
+    
+    setupTouristControls();
+    renderTouristCards();
+}
+
+function setupTouristControls(): void {
+    const sortDropdown = document.getElementById("sortDropdown") as HTMLSelectElement;
+    const orderDropdown = document.getElementById("orderDropdown") as HTMLSelectElement;
+    const pageSizeDropdown = document.getElementById("pageSizeDropdown") as HTMLSelectElement;
+    const prevPageBtn = document.getElementById("prevPageBtn") as HTMLButtonElement;
+    const nextPageBtn = document.getElementById("nextPageBtn") as HTMLButtonElement;
+
+    if (sortDropdown) {
+        sortDropdown.addEventListener("change", () => {
+            currentSort = sortDropdown.value;
+            currentPage = 1;
+            renderTouristCards();
+        });
+    }
+
+    if (orderDropdown) {
+        orderDropdown.addEventListener("change", () => {
+            currentOrder = orderDropdown.value;
+            currentPage = 1;
+            renderTouristCards();
+        });
+    }
+
+    if (pageSizeDropdown) {
+        pageSizeDropdown.addEventListener("change", () => {
+            pageSize = parseInt(pageSizeDropdown.value);
+            currentPage = 1;
+            renderTouristCards();
+        });
+    }
+
+    if (prevPageBtn) {
+        prevPageBtn.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTouristCards();
+            }
+        });
+    }
+
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTouristCards();
+            }
+        });
+    }
+
+    const modal = document.getElementById("tourDetailsModal") as HTMLElement;
+    const closeBtn = modal?.querySelector(".close") as HTMLElement;
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            if (modal) modal.style.display = "none";
+        });
+    }
+
+    window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+}
+
+function renderTouristCards(): void {
+    tourService.getAll(currentSort, currentOrder, currentPage, pageSize)
+        .then(results => {
+            const allTours = results.data;
+            const publishedTours = allTours.filter(tour => tour.status === 'published');
+            
+            const totalCount = publishedTours.length;
+            totalPages = Math.ceil(totalCount / pageSize);
+            
+            const container = document.querySelector('#toursCardsContainer');
+            if (!container) {
+                console.error('Cards container not found');
+                return;
+            }
+
+            container.innerHTML = '';
+
+            if (publishedTours.length === 0) {
+                container.innerHTML = '<p>No published tours available.</p>';
+                updatePaginationControls();
+                return;
+            }
+
+            publishedTours.forEach(tour => {
+                const card = createTourCard(tour);
+                container.appendChild(card);
+            });
+
+            updatePaginationControls();
+        })
+        .catch(error => {
+            console.error('Error loading tours:', error);
+            alert('Greška pri učitavanju tura');
+        });
+}
+
+function createTourCard(tour: Tour): HTMLElement {
+    const card = document.createElement('div');
+    card.classList.add('tour-card');
+
+    const title = document.createElement('h3');
+    title.textContent = tour.name;
+    card.appendChild(title);
+
+    const description = document.createElement('p');
+    const shortDesc = tour.description.length > 250 
+        ? tour.description.substring(0, 250) + '...' 
+        : tour.description;
+    description.textContent = shortDesc;
+    description.classList.add('tour-description');
+    card.appendChild(description);
+
+    const dateTime = document.createElement('p');
+    dateTime.innerHTML = `<strong>Date:</strong> ${formatDateTime(tour.dateTime)}`;
+    card.appendChild(dateTime);
+
+    const maxGuests = document.createElement('p');
+    maxGuests.innerHTML = `<strong>Max Guests:</strong> ${tour.maxGuests}`;
+    card.appendChild(maxGuests);
+
+    const detailsBtn = document.createElement('button');
+    detailsBtn.textContent = 'View Details';
+    detailsBtn.classList.add('details-btn');
+    detailsBtn.addEventListener('click', () => {
+        showTourDetails(tour.id!.toString());
+    });
+    card.appendChild(detailsBtn);
+
+    return card;
+}
+
+function formatDateTime(dateTimeStr: string): string {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString('sr-RS', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+}
+
+function showTourDetails(tourId: string): void {
+    tourService.getById(tourId)
+        .then(tour => {
+            const modal = document.getElementById("tourDetailsModal") as HTMLElement;
+            const content = document.getElementById("tourDetailsContent") as HTMLElement;
+
+            if (!modal || !content) return;
+
+            content.innerHTML = '';
+
+            const title = document.createElement('h2');
+            title.textContent = tour.name;
+            content.appendChild(title);
+
+            const description = document.createElement('p');
+            description.textContent = tour.description;
+            description.style.marginBottom = '20px';
+            content.appendChild(description);
+
+            const dateTime = document.createElement('p');
+            dateTime.innerHTML = `<strong>Date and Time:</strong> ${formatDateTime(tour.dateTime)}`;
+            content.appendChild(dateTime);
+
+            const maxGuests = document.createElement('p');
+            maxGuests.innerHTML = `<strong>Maximum Guests:</strong> ${tour.maxGuests}`;
+            content.appendChild(maxGuests);
+
+            if (tour.keyPoints && tour.keyPoints.length > 0) {
+                const kpTitle = document.createElement('h3');
+                kpTitle.textContent = 'Key Points';
+                kpTitle.style.marginTop = '30px';
+                content.appendChild(kpTitle);
+
+                tour.keyPoints.forEach(kp => {
+                    const kpCard = document.createElement('div');
+                    kpCard.classList.add('keypoint-detail');
+
+                    const kpName = document.createElement('h4');
+                    kpName.textContent = kp.name;
+                    kpCard.appendChild(kpName);
+
+                    const kpDesc = document.createElement('p');
+                    kpDesc.textContent = kp.description;
+                    kpCard.appendChild(kpDesc);
+
+                    const kpCoords = document.createElement('p');
+                    kpCoords.innerHTML = `<strong>Coordinates:</strong> ${kp.latitude}, ${kp.longitude}`;
+                    kpCard.appendChild(kpCoords);
+
+                    if (kp.imageUrl) {
+                        const kpImg = document.createElement('img');
+                        kpImg.src = kp.imageUrl;
+                        kpImg.alt = kp.name;
+                        kpImg.style.maxWidth = '100%';
+                        kpImg.style.borderRadius = '8px';
+                        kpImg.style.marginTop = '10px';
+                        kpCard.appendChild(kpImg);
+                    }
+
+                    content.appendChild(kpCard);
+                });
+            }
+
+            modal.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error loading tour details:', error);
+            alert('Greška pri učitavanju detalja ture');
+        });
+}
+
+function updatePaginationControls(): void {
+    const prevPageBtn = document.getElementById("prevPageBtn") as HTMLButtonElement;
+    const nextPageBtn = document.getElementById("nextPageBtn") as HTMLButtonElement;
+    const pageInfo = document.getElementById("pageInfo") as HTMLElement;
+
+    if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
+    if (nextPageBtn) nextPageBtn.disabled = currentPage === totalPages;
+    if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+}
+
+// ==================== PRIKAZ ZA VODICA (STARI KOD) ====================
+
 function renderData(): void {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     
+    // PROVERA: Ako nije vodic, turisticki prikaz
+    if (!isGuide() && !id) {
+        showTouristView();
+        return;
+    }
+     const guideView = document.querySelector('#guideView') as HTMLElement;
+    const touristView = document.querySelector('#touristView') as HTMLElement;
+
+    if (guideView) {
+        guideView.style.display = 'block';
+    }
+    if (touristView) {
+        touristView.style.display = 'none';
+    }
 
     if (id) {
         const table = document.querySelector('table');
         if (table) {
             table.style.display = 'none';
         }
-
     }
+    
     const addButton = document.querySelector("#addTourBtn");
     if (addButton) {
         addButton.addEventListener("click", async(event) => {
@@ -37,13 +309,13 @@ function renderData(): void {
         });
     }
 
-
     if (id) {
         return;
     }
 
-    tourService.getAll()
-        .then(tours => {
+    tourService.getAll("Name", "ASC", 1, 1000)
+        .then(results => {
+            const tours = results.data;
             console.log('Loaded tours:', tours);
 
             const table = document.querySelector('#toursTBody');
@@ -52,7 +324,6 @@ function renderData(): void {
                 console.error('Table body not found');
                 return;
             }
-
 
             table.innerHTML = '';
 
@@ -72,7 +343,7 @@ function renderData(): void {
                 newRow.appendChild(cell3);
 
                 const cell4 = document.createElement("td");
-                cell4.textContent = tours[i].dateTime;
+                cell4.textContent = formatDateTime(tours[i].dateTime);
                 newRow.appendChild(cell4);
 
                 const cell5 = document.createElement("td");
@@ -118,7 +389,6 @@ function renderData(): void {
         });
 }
 
-
 function submitData(): void {
     const name = (document.querySelector('#name') as HTMLInputElement).value;
     const description = (document.querySelector('#description') as HTMLInputElement).value;
@@ -143,7 +413,6 @@ function submitData(): void {
     const id = urlParams.get('id');
 
      if (id) {
-
         tourService.update(id, formData)
             .then(() => {
                 alert('Tura je uspešno ažurirana');
@@ -188,35 +457,36 @@ function initializeForm(): void {
         
         tourService.getById(id)
             .then(tour => {  
-                 console.log('🔍 === TOUR DEBUG ===');
-        console.log('Raw response:', JSON.stringify(tour, null, 2));
-        console.log('tour.keyPoints exists?', 'keyPoints' in tour);
-        console.log('tour.keyPoints value:', tour.keyPoints);
-        console.log('tour.keyPoints type:', typeof tour.keyPoints);
-        console.log('tour.keyPoints length:', tour.keyPoints?.length || 0);
-        
-        if (tour.keyPoints && tour.keyPoints.length > 0) {
-            console.log('✅ Key points FOUND:', tour.keyPoints);
-        } else {
-            console.log('❌ Key points EMPTY or UNDEFINED');
-        }
-        console.log('🔍 ===================');
+                console.log('🔍 === TOUR DEBUG ===');
+                console.log('Raw response:', JSON.stringify(tour, null, 2));
+                console.log('tour.keyPoints exists?', 'keyPoints' in tour);
+                console.log('tour.keyPoints value:', tour.keyPoints);
+                console.log('tour.keyPoints type:', typeof tour.keyPoints);
+                console.log('tour.keyPoints length:', tour.keyPoints?.length || 0);
+                
+                if (tour.keyPoints && tour.keyPoints.length > 0) {
+                    console.log('Key points FOUND:', tour.keyPoints);
+                } else {
+                    console.log('Key points EMPTY or UNDEFINED');
+                }
+                console.log('===================');
+                
                 (document.querySelector('#name') as HTMLInputElement).value = tour.name;
                 (document.querySelector('#description') as HTMLInputElement).value = tour.description;
                 (document.querySelector('#capacity') as HTMLInputElement).value = tour.maxGuests.toString(); 
                 (document.querySelector('#dateTime') as HTMLInputElement).value = tour.dateTime;
                 
                 updateDescriptionCounter();
+                
                 if (tour.keyPoints && tour.keyPoints.length > 0) {
-    console.log('📍 Found', tour.keyPoints.length, 'key points');
-    keyPoints = tour.keyPoints;  // Sačuvaj u globalnu promenljivu
-} else {
-    console.log('⚠️ No key points in tour');
-    keyPoints = [];
-}
-renderKeyPoints();  // Pozovi BEZ parametara
-validatePublishConditions();  // Proveri uslove za publish
-
+                    console.log('Found', tour.keyPoints.length, 'key points');
+                    keyPoints = tour.keyPoints;
+                } else {
+                    console.log('No key points in tour');
+                    keyPoints = [];
+                }
+                renderKeyPoints();
+                validatePublishConditions();
                 setupKeyPointForm(); 
             }).catch(error => {
                 console.error(error.status, error.text);
@@ -274,10 +544,9 @@ function renderKeyPoints(): void {
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
         deleteBtn.classList.add('deleteKeyPointBtn');
-        deleteBtn.dataset.id = kp.id.toString();
+        deleteBtn.dataset.id = kp.id!.toString();
         card.appendChild(deleteBtn);
 
-        
         keyPointsList.appendChild(card);
     });
     
@@ -459,7 +728,7 @@ function publishTour(): void {
     tourService.publish(currentTourId)
         .then(() => {
             alert('Tour successfully published!');
-            window.location.href = '../pages/tours.html';
+            window.location.href = 'tours.html';
         })
         .catch(error => {
             alert('Error publishing tour: ' + error.message);
